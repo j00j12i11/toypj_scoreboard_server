@@ -19,6 +19,7 @@ const usersController = {
                 if (err) throw err;
                 res.json({data:result});
             });
+            console.log("READ all users");
         } catch (error) {
             console.log(error);
         }
@@ -31,20 +32,34 @@ const usersController = {
                 if (err) throw err;
                 res.json({data:result});
             })
+            console.log(`READ user id = ${id}`);
         } catch (error) {
             console.log(error);
         }
     },
-    // 여기서부턴 고쳐야함.
-    create: (req, res) => {
+    getByName: (req, res) => {
         try {
-            const { name } = req.body;
-            console.log(`insert new user : ${name}`);
-            const sql = `INSERT INTO users (name) VALUES ('${name}')`;
+            const { name } = req.params;
+            const sql = "SELECT * FROM users WHERE name='${name}'";
             con.query(sql, function(err, result, fields) {
                 if (err) throw err;
                 res.json({data:result});
             })
+            console.log(`READ user name = '${name}'`);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    create: (req, res) => {
+        try {
+            const { name, age, gender } = req.body;
+            const sql = `INSERT INTO users (name, age, gender) VALUES ('${name}', ${age}, ${gender})`;
+            con.query(sql, function(err, result, fields) {
+                if (err) throw err;
+                res.json({data:result});
+            })
+            const gen_E = gender == true ? "male" : "female";
+            console.log(`insert new user ('${name}', '${age}', ${gen_E})`);
         } catch (error) {
             console.log(error);
             res.json({status: "error"});
@@ -52,14 +67,15 @@ const usersController = {
     },
     update: (req, res) => {
         try {
-            const { name, maches } = req.body;
+            const { name, age, gender } = req.body;
             const { id } = req.params;
-            const sql = `UPDATE users SET name = '${name}', maches = ${maches} WHERE id = ${id}`;
-            console.log("[send]", sql);
+            const sql = `UPDATE users SET name = '${name}', age = ${age}, gender = ${gender}  WHERE id = ${id}`;
             con.query(sql, function(err, result, fields) {
                 if (err) throw err;
                 res.json({data:result});
             })
+            const gen_E = gender == true ? "male" : "female";
+            console.log(`update user[id=${id}] to ('${name}', ${age}, ${gen_E})`);
         } catch (error) {
             console.log(error);
             res.json({status: "error"});
