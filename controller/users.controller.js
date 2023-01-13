@@ -1,26 +1,43 @@
-const { response } = require("express");
-const mysql = require("mysql");
-const con = mysql.createConnection({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+const con = require("../database/index");
 
-con.connect();
-
+const userParams = ['id', 'name', 'age', 'gender', 'win', 'lose'];
 const usersController = {
   getAll: (req, res) => {
     try {
-      const sql = "SELECT * FROM users";
+      let sql = "SELECT * FROM users ";
+      const { sortBy, ascending } = req.query;
+      if(userParams.includes(sortBy)){
+        sql += `ORDER BY ${sortBy} `;
+        if (ascending == 'false'){
+          sql += `DESC`
+        }
+      }
+      console.log(sql);
       con.query(sql, function (err, result, fields) {
         if (err) throw err;
         res.json({ data: result });
       });
-      console.log("READ all users");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  getByElement: (req, res) => {
+    try{
+      let sql = "SELECT * FROM users ";
+      const { id, name, age, gender } = req.query;
+      const gen_E = gender == true ? "male" : "female";
+      if (id) { sql += `WHERE id=${id}`}
+      else if (name) { sql += `WHERE name='${name}'`}
+      else if (age) { sql += `WHERE age=${age}`}
+      else if (gender) { sql += `WHERE age=${gen_E}`}
+
+      console.log(sql)
+      con.query(sql, function (err, result, fields) {
+        if (err) throw err;
+        res.json({ data: result });
+      });
+    } catch (err) {
+      console.log(err)
     }
   },
   getById: (req, res) => {
@@ -32,8 +49,8 @@ const usersController = {
         res.json({ data: result });
       });
       console.log(`READ user id = ${id}`);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   },
   getByName: (req, res) => {
@@ -45,8 +62,8 @@ const usersController = {
         res.json({ data: result });
       });
       console.log(`READ user name = '${name}'`);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   },
   create: (req, res) => {
@@ -59,9 +76,9 @@ const usersController = {
       });
       const gen_E = gender == true ? "male" : "female";
       console.log(`insert new user ('${name}', '${age}', ${gen_E})`);
-    } catch (error) {
-      console.log(error);
-      res.json({ status: "error" });
+    } catch (err) {
+      console.log(err);
+      res.json({ status: "err" });
     }
   },
   update: (req, res) => {
@@ -75,11 +92,33 @@ const usersController = {
       });
       const gen_E = gender == true ? "male" : "female";
       console.log(`update user[id=${id}] to ('${name}', ${age}, ${gen_E})`);
-    } catch (error) {
-      console.log(error);
-      res.json({ status: "error" });
+    } catch (err) {
+      console.log(err);
+      res.json({ status: "err" });
     }
   },
+  update1: (req, res) => {
+    try {
+      let sql = `UPDATE users SET `;
+      const { name, age, gender } = req.body;
+      console.log (name, age, gender)
+      const { id } = req.params;
+      const gen_E = gender == true ? "male" : "female";
+      if (name) { sql += `name = '${name}'`}
+      else if (age) { sql += ` age = ${age} ` }
+      else if (gender) { sql += ` gender = ${gen_E} ` }
+      sql += ` WHERE id = ${id}`;
+      con.query(sql, function (err, result, fields) {
+        if (err) throw err;
+        res.json({ data: result });
+      });
+      console.log(sql);
+      // console.log(`update user[id=${id}] to ('${name}', ${age}, ${gen_E})`);
+    } catch (err) {
+      console.log(err);
+      res.json({ status: "err" });
+    }
+  }
 };
 
 module.exports = usersController;
