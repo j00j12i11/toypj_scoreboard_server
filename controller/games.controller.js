@@ -6,7 +6,7 @@ const gamesController = {
     try {
       let sql = "SELECT * FROM games";
       const { sortBy, ascending } = req.query;
-      if(userParams.includes(sortBy)){
+      if(gameParams.includes(sortBy)){
         sql += `ORDER BY ${sortBy} `;
         if (ascending == 'false'){
           sql += `DESC`
