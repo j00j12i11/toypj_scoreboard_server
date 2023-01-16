@@ -1,8 +1,80 @@
-const con = require("../database/index");
+const pool = require("../database/index");
 
-const scoreParams = [ "id", "game_id", "user1_id", "user2_id", "user1_score", "user2_score", "date" ];
+const scoreParams = [
+  "id",
+  "game_id",
+  "user1_id",
+  "user2_id",
+  "user1_score",
+  "user2_score",
+  "date",
+];
+
+const check_update = (rows) => {
+  const { affectedRows, changedRows } = rows;
+  if (affectedRows == 1 && changedRows == 1) {
+    return true;
+  } else {
+    throw new Error("Update error");
+  }
+};
+const check_insert = (rows) => {
+  const { affectedRows } = rows;
+  if (affectedRows == 1) {
+    return true;
+  } else {
+    throw new Error("Insert error");
+  }
+};
+const newScore = async (conn, body) => {
+  const { game_id, user1_id, user2_id, user1_score, user2_score, date } = body;
+  const scores_values = [
+    game_id,
+    user1_id,
+    user2_id,
+    user1_score,
+    user2_score,
+    date,
+  ];
+  const scores_sql =
+    "INSERT INTO scores (game_id, user1_id, user2_id, user1_score, user2_score, date) VALUES (?, ?, ?, ?, ?, ?)";
+  try {
+    const [rows, fileds] = await conn.execute(scores_sql, scores_values);
+    return check_insert(rows);
+  } catch (error) {
+    throw error;
+  }
+};
+const setWinner = async (conn, winner) => {
+  const sql = `UPDATE users SET win = win + 1 WHERE id = ${winner}`;
+  try {
+    const [rows, fileds] = await conn.execute(sql);
+    return check_update(rows);
+  } catch (error) {
+    throw error;
+  }
+};
+const setLoser = async (conn, loser) => {
+  const sql = `UPDATE users SET lose = lose + 1 WHERE id = ${loser}`;
+  try {
+    const [rows, fileds] = await conn.execute(sql);
+    return check_update(rows);
+  } catch (error) {
+    throw error;
+  }
+};
+const setGame = async (conn, game) => {
+  const sql = `UPDATE games SET maches = maches + 1 WHERE id = ${game};`;
+  try {
+    const [rows, fileds] = await conn.execute(sql);
+    return check_update(rows);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const scoresController = {
-  getAll: (req, res) => {
+  getAll: async (req, res) => {
     try {
       let sql = "SELECT * FROM scores ";
       const { sortBy, ascending } = req.query;
@@ -13,121 +85,76 @@ const scoresController = {
         }
       }
       console.log(sql);
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows,
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
   },
-  getByElement: (req, res) => {
-    try{
+  getByElement: async (req, res) => {
+    try {
       let sql = "SELECT * FROM scores ";
       const { game_id, user1_id, user2_id } = req.query;
-      if (game_id) { sql += `WHERE game_id=${game_id}`}
-      else if (user1_id) { sql += `WHERE user1_id='${user1_id}'`}
-      else if (user2_id) { sql += `WHERE user2_id=${user2_id}`}
+      if (game_id) {
+        sql += `WHERE game_id=${game_id}`;
+      } else if (user1_id) {
+        sql += `WHERE user1_id='${user1_id}'`;
+      } else if (user2_id) {
+        sql += `WHERE user2_id=${user2_id}`;
+      }
 
-      console.log(sql)
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows,
       });
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.log(error);
     }
   },
-  getById: (req, res) => {
+  getById: async (req, res) => {
     try {
       const { id } = req.params;
       const sql = "SELECT * FROM scores WHERE id=?";
-      con.query(sql, id, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows,
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
   },
-  create: (req, res) => {
+  create: async (req, res) => {
+    let conn;
+    const { user1_id, user2_id, game_id } = req.body;
     try {
-      const { game_id, user1_id, user2_id, user1_score, user2_score, date } = req.body;
-      const values = [game_id, user1_id, user2_id, user1_score, user2_score, date];
-      const sql = `INSERT INTO scores (game_id, user1_id, user2_id, user1_score, user2_score, date) VALUES (?, ?, ?, ?, ?, ?)`
-      con.query(sql, values, function (err, result, fields) {
-        if (err) throw err;
-        req.update_s = {score: "OK"};
-        req.update_u = {winner: user1_id, loser: user2_id};
-        req.update_g = {game: game_id};
-        next();
-      });
-    } catch (err) {
-      console.log(err);
-      res.json({ status: "err" });
+      conn = await pool.getConnection(async (conn) => conn);
+      await conn.beginTransaction();
+      await newScore(conn, req.body);
+      await setWinner(conn, user1_id);
+      await setLoser(conn, user2_id);
+      await setGame(conn, game_id);
+
+      await conn.commit();
+      res.json({ status: 201 });
+    } catch (error) {
+      console.log(error);
+      if (conn) {
+        conn.rollback();
+        res.json({ status: 400 });
+      }
+    } finally {
+      if (conn) {
+        await conn.release();
+      }
     }
   },
-  update_u1: (req, res) => {
-    try {
-        const { winner, set } = req.update_u;
-        if (!set) set = "win + 1";
-        const sql = `UPDATE users SET win = ${set} WHERE id = ${winner}`
-        con.query(sql, function (err, result, fields) {
-            if (err) throw err;
-            req.update_u[win_status] ="OK";
-            next();
-          });
-    } catch (err) {
-        console.log(err);
-        res.json({ status: "err" });
-      }
-  },
-  update_u2: (req, res) => {
-    try {
-        const { loser, set } = req.update_u;
-        if (!set) set = "lose + 1";
-        const sql = `UPDATE users SET lose = ${set} WHERE id = ${loser}`
-        con.query(sql, function (err, result, fields) {
-            if (err) throw err;
-            req.update_u[lose_status] ="OK";
-            next();
-          });
-    } catch (err) {
-        console.log(err);
-        res.json({ status: "err" });
-      }
-  },
-  update_g: (req, res) => {
-    try {
-        const { game, set } = req.update_g;
-        if (!set) set = "maches + 1";
-        const sql = `UPDATE games SET maches = ${set} WHERE id = ${game};`
-        con.query(sql, function (err, result, fields) {
-            if (err) throw err;
-            req.update_g[game_status] ="OK";
-            res.json({status: [req.update_s, req.update_u, req.update_g]});
-          });
-    } catch (err) {
-        console.log(err);
-        res.json({ status: "err" });
-      }
-  },
-  update: (req, res) => {
-    try {
-      const { name, age, gender } = req.body;
-      const { id } = req.params;
-      const sql = `UPDATE users SET name = '${name}', age = ${age}, gender = ${gender}  WHERE id = ${id}`;
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
-      });
-      const gen_E = gender == true ? "male" : "female";
-      console.log(`update user[id=${id}] to ('${name}', ${age}, ${gen_E})`);
-    } catch (err) {
-      console.log(err);
-      res.json({ status: "err" });
-    }
-  }
 };
 
 module.exports = scoresController;

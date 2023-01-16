@@ -7,9 +7,8 @@ router.get("/", scoresController.getAll);
 router.get("/score", scoresController.getByElement);
 router.get("/:id", scoresController.getById);
 
-// router.post("/", scoresController.create);
-router.post("/", scoresController.create, scoresController.update_u1, scoresController.update_u2, scoresController.update_g);
+router.post("/", scoresController.create);
 
-router.put("/:id", scoresController.update);
+// router.put("/:id", scoresController.update);
 
 module.exports = router;
