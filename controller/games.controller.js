@@ -1,102 +1,115 @@
-const con = require("../database/index");
+const pool = require("../database/index");
 
 const gameParams = ['id', 'name', 'maches']
 const gamesController = {
-  getAll: (req, res) => {
+  getAll: async (req, res) => {
     try {
       let sql = "SELECT * FROM games";
       const { sortBy, ascending } = req.query;
-      if(gameParams.includes(sortBy)){
+      if (gameParams.includes(sortBy)) {
         sql += `ORDER BY ${sortBy} `;
-        if (ascending == 'false'){
-          sql += `DESC`
+        if (ascending == "false") {
+          sql += `DESC`;
         }
       }
       console.log(sql);
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows
       });
     } catch (error) {
       console.log(error);
+      res.json({ status: 400 });
     }
   },
-  getByElement: (req, res) => {
-    try{
+  getByElement: async (req, res) => {
+    try {
       let sql = "SELECT * FROM games ";
       const { id, name, maches } = req.query;
-      if (id) { sql += `WHERE id=${id}`}
-      else if (name) { sql += `WHERE name='${name}'`}
-      else if (maches) { sql += `WHERE maches=${maches}`}
-      console.log(sql)
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
-      });
-    } catch (err) {
-      console.log(err)
-    }
-  },
-  getById: (req, res) => {
-    try {
-      const { id } = req.params;
-      const sql = "SELECT * FROM games WHERE id=?";
-      con.query(sql, id, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      if (id) {
+        sql += `WHERE id=${id}`;
+      } else if (name) {
+        sql += `WHERE name='${name}'`;
+      } else if (maches) {
+        sql += `WHERE maches=${maches}`;
+      }
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        status: 200,
+        data: rows
       });
     } catch (error) {
       console.log(error);
+      res.json({ status: 400 });
     }
   },
-  create: (req, res) => {
+  getById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const sql = `SELECT * FROM games WHERE id=${id}`;
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        status: 200,
+        data: rows
+      });
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
+    }
+  },
+  create: async (req, res) => {
     try {
       const { name } = req.body;
       console.log(`insert new game : ${name}`);
       const sql = `INSERT INTO games (name) VALUES ('${name}')`;
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        status: 201
       });
     } catch (error) {
       console.log(error);
-      res.json({ status: "error" });
+      res.json({ status: 400 });
     }
   },
-  update: (req, res) => {
+  update: async (req, res) => {
     try {
       const { name, maches } = req.body;
       const { id } = req.params;
       const sql = `UPDATE games SET name = '${name}', maches = ${maches} WHERE id = ${id}`;
-      console.log("[send]", sql);
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        status: 201
       });
     } catch (error) {
       console.log(error);
-      res.json({ status: "error" });
+      res.json({ status: 400 });
     }
   },
-  update1: (req, res) => {
+  update1: async (req, res) => {
     try {
       let sql = `UPDATE games SET `;
       const { name, maches } = req.body;
-      console.log (name, maches);
+      console.log(name, maches);
       const { id } = req.params;
-      if (name) { sql += `name = '${name}'`}
-      else if (maches) { sql += `maches = ${maches}` }
+      if (name) {
+        sql += `name = '${name}'`;
+      } else if (maches) {
+        sql += `maches = ${maches}`;
+      }
       sql += ` WHERE id = ${id}`;
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
-      });
       console.log(sql);
-    } catch (err) {
-      console.log(err);
-      res.json({ status: "err" });
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        status: 201
+      });
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
     }
-  }
+  },
 };
 
 module.exports = gamesController;
