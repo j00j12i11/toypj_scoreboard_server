@@ -53,17 +53,64 @@ const scoresController = {
   create: (req, res) => {
     try {
       const { game_id, user1_id, user2_id, user1_score, user2_score, date } = req.body;
-      const sql = `INSERT INTO users (name, age, gender) VALUES ('${name}', ${age}, ${gender})`;
-      con.query(sql, function (err, result, fields) {
+      const values = [game_id, user1_id, user2_id, user1_score, user2_score, date];
+      const sql = `INSERT INTO scores (game_id, user1_id, user2_id, user1_score, user2_score, date) VALUES (?, ?, ?, ?, ?, ?)`
+      con.query(sql, values, function (err, result, fields) {
         if (err) throw err;
-        res.json({ data: result });
+        req.update_s = {score: "OK"};
+        req.update_u = {winner: user1_id, loser: user2_id};
+        req.update_g = {game: game_id};
+        next();
       });
-      const gen_E = gender == true ? "male" : "female";
-      console.log(`insert new user ('${name}', '${age}', ${gen_E})`);
     } catch (err) {
       console.log(err);
       res.json({ status: "err" });
     }
+  },
+  update_u1: (req, res) => {
+    try {
+        const { winner, set } = req.update_u;
+        if (!set) set = "win + 1";
+        const sql = `UPDATE users SET win = ${set} WHERE id = ${winner}`
+        con.query(sql, function (err, result, fields) {
+            if (err) throw err;
+            req.update_u[win_status] ="OK";
+            next();
+          });
+    } catch (err) {
+        console.log(err);
+        res.json({ status: "err" });
+      }
+  },
+  update_u2: (req, res) => {
+    try {
+        const { loser, set } = req.update_u;
+        if (!set) set = "lose + 1";
+        const sql = `UPDATE users SET lose = ${set} WHERE id = ${loser}`
+        con.query(sql, function (err, result, fields) {
+            if (err) throw err;
+            req.update_u[lose_status] ="OK";
+            next();
+          });
+    } catch (err) {
+        console.log(err);
+        res.json({ status: "err" });
+      }
+  },
+  update_g: (req, res) => {
+    try {
+        const { game, set } = req.update_g;
+        if (!set) set = "maches + 1";
+        const sql = `UPDATE games SET maches = ${set} WHERE id = ${game};`
+        con.query(sql, function (err, result, fields) {
+            if (err) throw err;
+            req.update_g[game_status] ="OK";
+            res.json({status: [req.update_s, req.update_u, req.update_g]});
+          });
+    } catch (err) {
+        console.log(err);
+        res.json({ status: "err" });
+      }
   },
   update: (req, res) => {
     try {
