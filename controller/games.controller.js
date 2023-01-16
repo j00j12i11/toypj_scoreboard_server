@@ -1,6 +1,6 @@
 const pool = require("../database/index");
 
-const gameParams = ['id', 'name', 'maches']
+const gameParams = ["id", "name", "maches"];
 const gamesController = {
   getAll: async (req, res) => {
     try {
@@ -16,7 +16,7 @@ const gamesController = {
       const [rows, fields] = await pool.query(sql);
       res.json({
         sataus: 200,
-        data: rows
+        data: rows,
       });
     } catch (error) {
       console.log(error);
@@ -38,7 +38,7 @@ const gamesController = {
       const [rows, fields] = await pool.query(sql);
       res.json({
         status: 200,
-        data: rows
+        data: rows,
       });
     } catch (error) {
       console.log(error);
@@ -52,7 +52,7 @@ const gamesController = {
       const [rows, fields] = await pool.query(sql);
       res.json({
         status: 200,
-        data: rows
+        data: rows,
       });
     } catch (error) {
       console.log(error);
@@ -66,7 +66,7 @@ const gamesController = {
       const sql = `INSERT INTO games (name) VALUES ('${name}')`;
       const [rows, fields] = await pool.query(sql);
       res.json({
-        status: 201
+        status: 201,
       });
     } catch (error) {
       console.log(error);
@@ -81,7 +81,7 @@ const gamesController = {
       console.log(sql);
       const [rows, fields] = await pool.query(sql);
       res.json({
-        status: 201
+        status: 201,
       });
     } catch (error) {
       console.log(error);
@@ -103,7 +103,7 @@ const gamesController = {
       console.log(sql);
       const [rows, fields] = await pool.query(sql);
       res.json({
-        status: 201
+        status: 201,
       });
     } catch (error) {
       console.log(error);
