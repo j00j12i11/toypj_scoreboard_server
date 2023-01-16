@@ -1,124 +1,124 @@
-const con = require("../database/index");
+const pool = require("../database/index");
 
-const userParams = ['id', 'name', 'age', 'gender', 'win', 'lose'];
+const userParams = ["id", "name", "age", "gender", "win", "lose"];
 const usersController = {
-  getAll: (req, res) => {
+  getAll: async (req, res) => {
     try {
       let sql = "SELECT * FROM users ";
       const { sortBy, ascending } = req.query;
-      if(userParams.includes(sortBy)){
+      if (userParams.includes(sortBy)) {
         sql += `ORDER BY ${sortBy} `;
-        if (ascending == 'false'){
-          sql += `DESC`
+        if (ascending == "false") {
+          sql += `DESC`;
         }
       }
       console.log(sql);
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows,
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
     }
   },
-  getByElement: (req, res) => {
-    try{
+  getByElement: async (req, res) => {
+    try {
       let sql = "SELECT * FROM users ";
       const { id, name, age, gender } = req.query;
       const gen_E = gender == true ? "male" : "female";
-      if (id) { sql += `WHERE id=${id}`}
-      else if (name) { sql += `WHERE name='${name}'`}
-      else if (age) { sql += `WHERE age=${age}`}
-      else if (gender) { sql += `WHERE age=${gen_E}`}
-
-      console.log(sql)
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      if (id) {
+        sql += `WHERE id=${id}`;
+      } else if (name) {
+        sql += `WHERE name='${name}'`;
+      } else if (age) {
+        sql += `WHERE age=${age}`;
+      } else if (gender) {
+        sql += `WHERE age=${gen_E}`;
+      }
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows,
       });
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
     }
   },
-  getById: (req, res) => {
+  getById: async (req, res) => {
     try {
       const { id } = req.params;
-      const sql = "SELECT * FROM users WHERE id=?";
-      con.query(sql, id, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      const sql = `SELECT * FROM users WHERE id=${id}`;
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 200,
+        data: rows,
       });
-      console.log(`READ user id = ${id}`);
     } catch (err) {
-      console.log(err);
+      console.log(error);
+      res.json({ status: 400 });
     }
   },
-  getByName: (req, res) => {
-    try {
-      const { name } = req.params;
-      const sql = "SELECT * FROM users WHERE name='${name}'";
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
-      });
-      console.log(`READ user name = '${name}'`);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  create: (req, res) => {
+  create: async (req, res) => {
     try {
       const { name, age, gender } = req.body;
       const sql = `INSERT INTO users (name, age, gender) VALUES ('${name}', ${age}, ${gender})`;
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 201,
       });
-      const gen_E = gender == true ? "male" : "female";
-      console.log(`insert new user ('${name}', '${age}', ${gen_E})`);
-    } catch (err) {
-      console.log(err);
-      res.json({ status: "err" });
+      // const gen_E = gender == true ? "male" : "female";
+      // console.log(`insert new user ('${name}', '${age}', ${gen_E})`);
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
     }
   },
-  update: (req, res) => {
+  update: async (req, res) => {
     try {
       const { name, age, gender } = req.body;
       const { id } = req.params;
       const sql = `UPDATE users SET name = '${name}', age = ${age}, gender = ${gender}  WHERE id = ${id}`;
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
+      console.log(sql);
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 201,
       });
-      const gen_E = gender == true ? "male" : "female";
-      console.log(`update user[id=${id}] to ('${name}', ${age}, ${gen_E})`);
-    } catch (err) {
-      console.log(err);
-      res.json({ status: "err" });
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
     }
   },
-  update1: (req, res) => {
+  update1: async (req, res) => {
     try {
       let sql = `UPDATE users SET `;
       const { name, age, gender } = req.body;
-      console.log (name, age, gender)
+      console.log(name, age, gender);
       const { id } = req.params;
       const gen_E = gender == true ? "male" : "female";
-      if (name) { sql += `name = '${name}'`}
-      else if (age) { sql += ` age = ${age} ` }
-      else if (gender) { sql += ` gender = ${gen_E} ` }
+      if (name) {
+        sql += `name = '${name}'`;
+      } else if (age) {
+        sql += ` age = ${age} `;
+      } else if (gender) {
+        sql += ` gender = ${gen_E} `;
+      }
       sql += ` WHERE id = ${id}`;
-      con.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        res.json({ data: result });
-      });
       console.log(sql);
-      // console.log(`update user[id=${id}] to ('${name}', ${age}, ${gen_E})`);
-    } catch (err) {
-      console.log(err);
-      res.json({ status: "err" });
+      const [rows, fields] = await pool.query(sql);
+      res.json({
+        sataus: 201,
+      });
+    } catch (error) {
+      console.log(error);
+      res.json({ status: 400 });
     }
-  }
+  },
 };
 
 module.exports = usersController;
