@@ -6,9 +6,8 @@ const scoresController = require("../controller/scores.controller");
 router.get("/", scoresController.getAll);
 router.get("/score", scoresController.getByElement);
 router.get("/:id", scoresController.getById);
-
 router.post("/", scoresController.create);
-
-// router.put("/:id", scoresController.update);
+router.put("/:id", scoresController.update);
+router.patch("/:id", scoresController.update);
 
 module.exports = router;
