@@ -4,7 +4,7 @@ const gameParams = ["id", "name", "maches"];
 const gamesController = {
   getAll: async (req, res) => {
     try {
-      let sql = "SELECT * FROM games";
+      let sql = "SELECT * FROM games ";
       const { sortBy, ascending } = req.query;
       if (gameParams.includes(sortBy)) {
         sql += `ORDER BY ${sortBy} `;
