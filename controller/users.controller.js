@@ -27,7 +27,7 @@ const usersController = {
     try {
       let sql = "SELECT * FROM users ";
       const { id, name, age, gender } = req.query;
-      const gen_E = gender == true ? "male" : "female";
+      // const gen_E = gender == true ? "male" : "female";
       if (id) {
         sql += `WHERE id=${id}`;
       } else if (name) {
@@ -35,7 +35,7 @@ const usersController = {
       } else if (age) {
         sql += `WHERE age=${age}`;
       } else if (gender) {
-        sql += `WHERE age=${gen_E}`;
+        sql += `WHERE gender=${gender}`;
       }
       console.log(sql);
       const [rows, fields] = await pool.query(sql);
