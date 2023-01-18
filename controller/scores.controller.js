@@ -217,7 +217,7 @@ const scoresController = {
   getById: async (req, res) => {
     try {
       const { id } = req.params;
-      const sql = "SELECT * FROM scores WHERE id=?";
+      const sql = `SELECT * FROM scores WHERE id=${id}`;
       console.log(sql);
       const [rows, fields] = await pool.query(sql);
       res.json({

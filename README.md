@@ -609,5 +609,351 @@ code:
             ```
         <br>
 
-
+### scores table
++ 조회(READ)
+    + id로 score 조회
+        + METHOD: `GET`   
+        + URL: `/api/v1/scores/{id}`
+        + Request Body:    
+            ```
+            null
+            ```
+        + Response Body:     
+            ```json
+            // example about `/api/v1/scores/1`
+            {
+                "sataus": 200,
+                "data": [
+                    {
+                        "id": 1,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2022-12-28T02:24:34.000Z"
+                    }
+                ]
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
+    + 저장된 모든 score 조회
+        + METHOD: `GET`   
+        + URL: `/api/v1/scores`   
+        + Request Body:    
+            ```
+            null
+            ```
+        + Response Body:     
+            ```json
+            {
+                "sataus": 200,
+                "data": [
+                    {
+                        "id": 1,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2022-12-28T02:24:34.000Z"
+                    },
+                    {
+                        "id": 2,
+                        "game_id": 3,
+                        "user1_id": 2,
+                        "user2_id": 4,
+                        "user1_score": 9,
+                        "user2_score": 4,
+                        "date": "2022-12-30T13:45:50.000Z"
+                    },
+                    {
+                        "id": 3,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2023-01-05T04:10:41.000Z"
+                    },
+                    {
+                        "id": 4,
+                        "game_id": 1,
+                        "user1_id": 2,
+                        "user2_id": 1,
+                        "user1_score": 5,
+                        "user2_score": 3,
+                        "date": "2023-01-11T06:45:11.000Z"
+                    }
+                ]
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
+    + 저장된 모든 score 조회 + 특정 필드에 대해 정렬(오름차순)
+        + METHOD: `GET`   
+        + URL: `/api/v1/scores?sortBy={'field'}`   
+        + Request Body:    
+            ```
+            null
+            ```
+        + Response Body:     
+            ```json
+            // example about `/api/v1/scores?sortBy=game_id`
+            {
+                "sataus": 200,
+                "data": [
+                    {
+                        "id": 4,
+                        "game_id": 1,
+                        "user1_id": 2,
+                        "user2_id": 1,
+                        "user1_score": 5,
+                        "user2_score": 3,
+                        "date": "2023-01-11T06:45:11.000Z"
+                    },
+                    {
+                        "id": 2,
+                        "game_id": 3,
+                        "user1_id": 2,
+                        "user2_id": 4,
+                        "user1_score": 9,
+                        "user2_score": 4,
+                        "date": "2022-12-30T13:45:50.000Z"
+                    },
+                    {
+                        "id": 1,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2022-12-28T02:24:34.000Z"
+                    },
+                    {
+                        "id": 3,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2023-01-05T04:10:41.000Z"
+                    }
+                ]
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
+    + 저장된 모든 score 조회 + 특정 필드에 대해 정렬(내림차순)
+        + METHOD: `GET`   
+        + URL: `/api/v1/scores?sortBy={'field'}&ascending=false`  
+        + Request Body:    
+            ```
+            null
+            ``` 
+        + Response Body:     
+            ```json
+            // example about `/api/v1/scores?sortBy=date&ascending=false`
+            {
+                "sataus": 200,
+                "data": [
+                    {
+                        "id": 4,
+                        "game_id": 1,
+                        "user1_id": 2,
+                        "user2_id": 1,
+                        "user1_score": 5,
+                        "user2_score": 3,
+                        "date": "2023-01-11T06:45:11.000Z"
+                    },
+                    {
+                        "id": 3,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2023-01-05T04:10:41.000Z"
+                    },
+                    {
+                        "id": 2,
+                        "game_id": 3,
+                        "user1_id": 2,
+                        "user2_id": 4,
+                        "user1_score": 9,
+                        "user2_score": 4,
+                        "date": "2022-12-30T13:45:50.000Z"
+                    },
+                    {
+                        "id": 1,
+                        "game_id": 5,
+                        "user1_id": 1,
+                        "user2_id": 2,
+                        "user1_score": 3,
+                        "user2_score": 1,
+                        "date": "2022-12-28T02:24:34.000Z"
+                    }
+                ]
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
+    + 특정 조건과 일치하는 score 조회 ['filed'가 'value'값을 가지는 모든 score]
+        + METHOD: `GET`   
+        + URL: `/api/v1/scores/score?{'field'}={'value'}`   
+        + Request Body:    
+            ```
+            null
+            ```
+        + Response Body:     
+            ```json
+            // example about `/api/v1/scores/score?user1_id=2`
+            {
+                "sataus": 200,
+                "data": [
+                    {
+                        "id": 2,
+                        "game_id": 3,
+                        "user1_id": 2,
+                        "user2_id": 4,
+                        "user1_score": 9,
+                        "user2_score": 4,
+                        "date": "2022-12-30T13:45:50.000Z"
+                    },
+                    {
+                        "id": 4,
+                        "game_id": 1,
+                        "user1_id": 2,
+                        "user2_id": 1,
+                        "user1_score": 5,
+                        "user2_score": 3,
+                        "date": "2023-01-11T06:45:11.000Z"
+                    }
+                ]
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
++ 생성(CREATE)
+    + 새로운 게임 생성
+        + METHOD: `POST`   
+        + URL: `/api/v1/scores`   
+        + Request Body:    
+            ```json
+            {
+                "game_id" : "{game's id}",
+                "user1_id" : "{win user's id}",
+                "user2_id" : "{lose user's id}",
+                "user1_score" : "{win user's score}",
+                "user2_score" : "{lose user's score}",
+                "date" : "{YYYY/MM/DD hh:mm:ss}"
+            }
+            ```
+        + Response Body:     
+            ```json
+            // success
+            {
+                "status" : 201
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
++ 변경(UPDATE)   
+    + 특정 id의 모든 필드 일괄 변경   
+        + METHOD: `PUT`   
+        + URL: `/api/v1/scores/{id}`   
+        + Request Body:    
+            ```json
+            {
+                "game_id" : "{game's id}",
+                "user1_id" : "{win user's id}",
+                "user2_id" : "{lose user's id}",
+                "user1_score" : "{win user's score}",
+                "user2_score" : "{lose user's score}",
+                "date" : "{YYYY/MM/DD hh:mm:ss}"
+            }
+            ```
+        + Response Body:     
+            ```json
+            // success
+            {
+                "status" : 201
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
+    + 특정 id의 몇몇 필드 변경(여러개 가능) 
+        + METHOD: `PATCH`   
+        + URL: `/api/v1/scores/{id}`    
+        <span style="color: #ffa0a0"> <b> 단 항상 user1이 승자(점수가 더 높음)!! </b> </span> 
+        + Request Body:    
+            ```json
+            {
+                "game_id" : "{game's id}",
+                "user1_id" : "{win user's id}",
+                "user2_id" : "{lose user's id}",
+            }
+            ```   
+            또는
+            ```json
+            {
+               "age" : "{new age}"
+            }
+            ```
+            또는
+            ```json
+            {
+               "gender" : "{male = true / female = false}"
+            }
+            ```
+        + Response Body:     
+            ```json
+            // success
+            {
+                "status" : 201
+            }
+            ```
+            ```json
+            // fail
+            {
+                "status" : 400
+            }
+            ```
+        <br>
   
