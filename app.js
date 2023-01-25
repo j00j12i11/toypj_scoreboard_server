@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 //   console.log('Connected to database.');
 // });
 
-connection.end();
+// connection.end();
 
 app.listen(PORT, () => {
   console.log("Server running... in ", PORT);
