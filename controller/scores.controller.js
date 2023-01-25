@@ -172,7 +172,7 @@ const prevScore = async (conn, id) => {
 };
 
 const scoresController = {
-  getAll: async (req, res) => {
+  getAll: async (req, res, next) => {
     try {
       let sql = "SELECT * FROM scores ";
       const { sortBy, ascending } = req.query;
@@ -189,32 +189,35 @@ const scoresController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   },
-  getByElement: async (req, res) => {
+  getByElement: async (req, res, next) => {
     try {
       let sql = "SELECT * FROM scores ";
       const { game_id, user1_id, user2_id } = req.query;
       if (game_id) {
         sql += `WHERE game_id=${game_id}`;
       } else if (user1_id) {
-        sql += `WHERE user1_id='${user1_id}'`;
+        sql += `WHERE user1_id=${user1_id}`;
       } else if (user2_id) {
         sql += `WHERE user2_id=${user2_id}`;
       }
 
       console.log(sql);
       const [rows, fields] = await pool.query(sql);
+      if (rows.length == 0) {
+        throw Error("has no results");
+      }
       res.json({
         sataus: 200,
         data: rows,
       });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   },
-  getById: async (req, res) => {
+  getById: async (req, res, next) => {
     try {
       const { id } = req.params;
       const sql = `SELECT * FROM scores WHERE id=${id}`;
@@ -225,10 +228,10 @@ const scoresController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   },
-  create: async (req, res) => {
+  create: async (req, res, next) => {
     let conn;
     const { user1_id, user2_id, game_id } = req.body;
     try {
@@ -245,15 +248,16 @@ const scoresController = {
       console.log(error);
       if (conn) {
         conn.rollback();
-        res.json({ status: 400 });
       }
+      // res.json({ status: 400 });
+      next(error);
     } finally {
       if (conn) {
         await conn.release();
       }
     }
   },
-  update: async (req, res) => {
+  update: async (req, res, next) => {
     let conn;
     const id = req.params.id;
     try {
@@ -283,8 +287,9 @@ const scoresController = {
       console.log(error);
       if (conn) {
         conn.rollback();
-        res.json({ status: 400 });
       }
+      // res.json({ status: 400 });
+      next(error);
     } finally {
       if (conn) {
         await conn.release();

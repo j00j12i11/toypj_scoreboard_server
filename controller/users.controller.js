@@ -2,7 +2,7 @@ const pool = require("../database/index");
 
 const userParams = ["id", "name", "age", "gender", "win", "lose"];
 const usersController = {
-  getAll: async (req, res) => {
+  getAll: async (req, res, next) => {
     try {
       let sql = "SELECT * FROM users ";
       const { sortBy, ascending } = req.query;
@@ -19,11 +19,10 @@ const usersController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  getByElement: async (req, res) => {
+  getByElement: async (req, res, next) => {
     try {
       let sql = "SELECT * FROM users ";
       const { id, name, age, gender } = req.query;
@@ -44,11 +43,10 @@ const usersController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  getById: async (req, res) => {
+  getById: async (req, res, next) => {
     try {
       const { id } = req.params;
       const sql = `SELECT * FROM users WHERE id=${id}`;
@@ -63,7 +61,7 @@ const usersController = {
       res.json({ status: 400 });
     }
   },
-  create: async (req, res) => {
+  create: async (req, res, next) => {
     try {
       const { name, age, gender } = req.body;
       const sql = `INSERT INTO users (name, age, gender) VALUES ('${name}', ${age}, ${gender})`;
@@ -75,11 +73,10 @@ const usersController = {
       // const gen_E = gender == true ? "male" : "female";
       // console.log(`insert new user ('${name}', '${age}', ${gen_E})`);
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  update: async (req, res) => {
+  update: async (req, res, next) => {
     try {
       const { name, age, gender } = req.body;
       const { id } = req.params;
@@ -90,11 +87,10 @@ const usersController = {
         sataus: 201,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      cnext(error);
     }
   },
-  update1: async (req, res) => {
+  update1: async (req, res, next) => {
     try {
       let sql = `UPDATE users SET `;
       const { name, age, gender } = req.body;
@@ -115,8 +111,7 @@ const usersController = {
         sataus: 201,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
 };

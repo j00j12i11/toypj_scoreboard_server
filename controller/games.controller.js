@@ -2,7 +2,7 @@ const pool = require("../database/index");
 
 const gameParams = ["id", "name", "maches"];
 const gamesController = {
-  getAll: async (req, res) => {
+  getAll: async (req, res, next) => {
     try {
       let sql = "SELECT * FROM games ";
       const { sortBy, ascending } = req.query;
@@ -19,11 +19,10 @@ const gamesController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  getByElement: async (req, res) => {
+  getByElement: async (req, res, next) => {
     try {
       let sql = "SELECT * FROM games ";
       const { id, name, maches } = req.query;
@@ -41,11 +40,10 @@ const gamesController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  getById: async (req, res) => {
+  getById: async (req, res, next) => {
     try {
       const { id } = req.params;
       const sql = `SELECT * FROM games WHERE id=${id}`;
@@ -55,11 +53,10 @@ const gamesController = {
         data: rows,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  create: async (req, res) => {
+  create: async (req, res, next) => {
     try {
       const { name } = req.body;
       console.log(`insert new game : ${name}`);
@@ -69,11 +66,10 @@ const gamesController = {
         status: 201,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  update: async (req, res) => {
+  update: async (req, res, next) => {
     try {
       const { name, maches } = req.body;
       const { id } = req.params;
@@ -84,11 +80,10 @@ const gamesController = {
         status: 201,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
-  update1: async (req, res) => {
+  update1: async (req, res, next) => {
     try {
       let sql = `UPDATE games SET `;
       const { name, maches } = req.body;
@@ -106,8 +101,7 @@ const gamesController = {
         status: 201,
       });
     } catch (error) {
-      console.log(error);
-      res.json({ status: 400 });
+      next(error);
     }
   },
 };
