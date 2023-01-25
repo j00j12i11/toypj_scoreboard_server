@@ -16,6 +16,11 @@ app.use("/api/v1/scores", scoresRouter);
 
 const PORT = process.env.PORT || 3000;
 
+app.get('/', (req, res) => {
+  res.json({
+      msg: "hello world!",
+  });
+})
 app.listen(PORT, () => {
-  console.log("Server running...");
+  console.log("Server running... in ", PORT);
 });
