@@ -1,10 +1,7 @@
 {
   "name": "scoreboard_api",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
-  "scripts": {
-    "start": "node run app.js"
-  },
   "dependencies": {
     "aws-sdk": "^2.1301.0",
     "dotenv": "^16.0.3",
@@ -17,5 +14,8 @@
     "eslint": "^8.31.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0"
+  },
+  "scripts": {
+    "start": "node app.js"
   }
 }
