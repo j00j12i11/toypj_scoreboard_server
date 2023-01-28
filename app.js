@@ -14,7 +14,8 @@ app.use("/api/v1/games", gamesRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/scores", scoresRouter);
 
-const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 app.get('/', (req, res) => {
   res.json({
